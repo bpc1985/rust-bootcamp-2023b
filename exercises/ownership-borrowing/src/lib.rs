@@ -33,6 +33,23 @@ fn take_ownership(s: String) -> String {
     s
 }
 
+fn exercise2b() {
+    let s1 = String::from("hello, world");
+    let s2 = take_ownershipb(&s1);
+
+    println!("{}", s2);
+    println!("{}", s1);
+}
+// Only modify the code below!
+// fn take_ownership(s: String) {
+//     println!("{}", s);
+// }
+
+fn take_ownershipb(s: &String) -> &String {
+    // println!("{}", s);
+    &s
+}
+
 // Exercise 3
 // Make it compile
 // Dont care about logic
@@ -77,6 +94,7 @@ fn exercise3() {
         let mut addition: f64 = 0.0;
 
         // Sumar valores en additions
+        // *element_index => lay gia tri index
         for &element_index in additions.iter() {
             let addition_aux = values[element_index];
             addition = addition_aux + addition;
@@ -116,6 +134,8 @@ fn exercise3b() {
 //     str_ref // Return the reference to the String
 // }
 
+
+// Related to Dangling Reference
 fn exercise4(value: u32) -> String {
     let str_value = value.to_string(); // Convert u32 to String
     str_value
@@ -127,6 +147,20 @@ fn exercise4b(value: u32) -> &'static str {
     let boxed_str: Box<str> = str_value.into_boxed_str();
     let static_str: &'static str = Box::leak(boxed_str);
     static_str
+}
+
+fn exercise4c(value: u32) -> &'static str {
+    let str_value = value.to_string();
+    let str_ref: &str = &str_value;
+    "Hello"
+}
+
+fn exercise4d(value: u32) -> &'static str {
+    match value {
+        0 => "zero", // &'static str
+        1 => "one",
+        _ => "unknown"
+    }
 }
 
 // Exercise 5
@@ -149,7 +183,47 @@ use std::collections::HashMap;
 //     println!("{}", res);
 // }
 
-fn exercise5() {
+// Do scope None sau khi thoat, bien value ko con ton tai, reference toi no se bi loi
+
+fn exercise5a() {
+    let mut my_map = HashMap::from([(1, "1.0".to_string()), (2, "2.0".to_string())]);
+
+    let key = 3;
+    let value = "3.0".to_string();
+
+    let res = match my_map.get(&key) {
+        Some(child) => child,
+        None => {
+            my_map.insert(key, value.clone());
+            &value // HERE IT FAILS
+        }
+    };
+
+    println!("{}", res);
+}
+
+fn exercise5aa() {
+    let mut my_map = HashMap::from([
+        (1, "1.0".to_string()),
+        (2, "2.0".to_string())
+    ]);
+
+    let key = 3;
+
+    let res = match my_map.get(&key) {
+        Some(child) => child,
+        None => {
+            let value = "3.0".to_string();
+            my_map.insert(key, value);
+            // &value
+            my_map.get(&key).unwrap()
+        }
+    };
+
+    println!("{}", res);
+}
+
+fn exercise5b() {
     let mut my_map = HashMap::from([
         (1, "1.0".to_string()),
         (2, "2.0".to_string())
@@ -170,7 +244,7 @@ fn exercise5() {
 }
 
 // need to understand more the way to use Box !!!
-fn exercise5b() {
+fn exercise5c() {
     let mut my_map = HashMap::from([(1, "1.0".to_string()), (2, "2.0".to_string())]);
 
     let key = 3;
@@ -206,15 +280,36 @@ use std::io;
 //     }
 // }
 
-fn exercise6() {
+// Tại data được tạo trong mỗi vòng for
+// còn prev_key nằm scope rộng hơn nên nó lấy data[0] thì lỗi
+// data se bi drop sau moi lan lap for => dangling reference
+
+fn exercise6a() {
     let mut prev_key: String = String::new();
 
     for line in io::stdin().lines() {
         let s = line.unwrap();
-
+        /*
+        data phu thuoc vao s,
+        s chuyen ownership cho data,
+        data is ownership now, se bi xoa sau moi dong lap for
+        */
         let data: Vec<&str> = s.split('\t').collect();
         if prev_key.is_empty() {
-            prev_key = String::from(data[0]);
+            // prev_key = String::from(data[0]);
+            prev_key = data[0].to_string();
+            // prev_key = data[0].to_owned();
+        }
+    }
+}
+
+fn exercise6b() {
+    for line in io::stdin().lines() {
+        let mut prev_key: &str = "";
+        let s = line.unwrap();
+        let data: Vec<&str> = s.split("\t").collect();
+        if prev_key.len() == 0 {
+            prev_key = data[0];
         }
     }
 }
