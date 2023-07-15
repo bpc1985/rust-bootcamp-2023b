@@ -1,3 +1,5 @@
+use std::u8;
+
 // Exercise 1
 // Fill in the two impl blocks to make the code work.
 // Make it compile
@@ -10,20 +12,31 @@ trait Hello {
     fn say_something(&self) -> String;
 }
 
-//TODO 
+//TODO
 struct Student {}
 impl Hello for Student {
+    fn say_something(&self) -> String {
+        String::from("I'm a good student")
+    }
 }
 //TODO
 struct Teacher {}
 impl Hello for Teacher {
+    fn say_hi(&self) -> String {
+        String::from("Hi, I'm your new teacher")
+    }
+
+    fn say_something(&self) -> String {
+        String::from("I'm not a bad teacher")
+    }
 }
 
 
 // Exercise 2
 // Make it compile in unit test for exercise 2
-// Hint: use #[derive]  for struct Point 
+// Hint: use #[derive]  for struct Point
 // Run tests
+#[derive(Debug, PartialEq)]
 struct Point {
     x: i32,
     y: i32,
@@ -31,11 +44,11 @@ struct Point {
 
 
 // Exercise 3
-// Make it compile 
+// Make it compile
 // Implement `fn sum` with trait bound in two ways.
 // Run tests
 // Hint: Trait Bound
-fn sum<T>(x: T, y: T) -> T {
+fn sum<T: std::ops::Add<Output = T>>(x: T, y: T) -> T {
     x + y
 }
 
@@ -57,17 +70,21 @@ impl Foo for String {
 }
 
 // IMPLEMENT below with generics and parameters
-fn static_dispatch(x) {
-    todo!()
+fn static_dispatch<T: Foo>(x: T) -> String {
+    x.method()
 }
 
 // Implement below with trait objects and parameters
-fn dynamic_dispatch(x) {
-    todo!()
+fn dynamic_dispatch(x: &dyn Foo) -> String {
+    x.method()
 }
 
-// Exercise 5 
-// Fix errors and fill in the blanks 
+fn dynamic_dispatch2<T: Foo>(x: &T) -> String {
+    x.method()
+}
+
+// Exercise 5
+// Fix errors and fill in the blanks
 // Run tests
 // Hint: &dyn and Box<dyn>
 trait Draw {
@@ -90,29 +107,67 @@ fn draw_with_box(x: Box<dyn Draw>) {
     x.draw();
 }
 
-fn draw_with_ref(x: __) {
+fn draw_with_ref(x: &dyn Draw) {
     x.draw();
 }
 
 // Exercise 6
-// Fix errors and implement 
+// Fix errors and implement
 // Run tests
 // Hint: Associated Type
 
-trait Container {
-    type Item;
-    fn insert(&mut self, item: Self::Item);
-    fn remove(&mut self) -> Option<Self::Item>;
+// trait Container {
+//     type Item;
+//     fn insert(&mut self, item: Self::Item);
+//     fn remove(&mut self) -> Option<Self::Item>;
+//     fn is_empty(&self) -> bool;
+// }
+
+// struct Stack {
+//     items: Vec<u8>,
+// }
+
+// //TODO implement Container for Stack
+// impl Container for Stack {
+//     type Item = u8;
+
+//     fn insert(&mut self, item: Self::Item) {
+//         self.items.push(item);
+//     }
+
+//     fn remove(&mut self) -> Option<Self::Item> {
+//         self.items.pop()
+//     }
+
+//     fn is_empty(&self) -> bool {
+//         self.items.is_empty()
+//     }
+// }
+
+// Using generic
+trait Container<T> {
+    fn insert(&mut self, item: T);
+    fn remove(&mut self) -> Option<T>;
     fn is_empty(&self) -> bool;
 }
 
-struct Stack {
-    items: Vec<u8>,
+struct Stack<T> {
+    items: Vec<T>,
 }
 
-//TODO implement Container for Stack
+impl<T> Container<T> for Stack<T> {
+    fn insert(&mut self, item: T) {
+        self.items.push(item);
+    }
 
+    fn remove(&mut self) -> Option<T> {
+        self.items.pop()
+    }
 
+    fn is_empty(&self) -> bool {
+        self.items.is_empty()
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -125,10 +180,10 @@ mod tests {
         let s = Student {};
         assert_eq!(s.say_hi(), "hi");
         assert_eq!(s.say_something(), "I'm a good student");
-    
+
         let t = Teacher {};
         assert_eq!(t.say_hi(), "Hi, I'm your new teacher");
-        assert_eq!(t.say_something(), "I'm not a bad teacher");   
+        assert_eq!(t.say_something(), "I'm not a bad teacher");
     }
 
     #[test]
@@ -150,25 +205,26 @@ mod tests {
     fn exercise4_should_work() {
         let x = 5u8;
         let y = "Hello".to_string();
-    
+
         static_dispatch(x);
-        dynamic_dispatch(&y); 
+        dynamic_dispatch(&y);
     }
 
     #[test]
     fn exercise5_should_work() {
         let x = 1.1f64;
         let y = 8u8;
-    
+
         // Draw x.
-        draw_with_box(__);
-    
+        draw_with_box(Box::new(x));
+
         // Draw y.
         draw_with_ref(&y);
     }
 
     #[test]
     fn exercise6_should_work(){
+        // let mut stack: Stack = Stack { items: Vec::new() };
         let mut stack: Stack<u8> = Stack { items: Vec::new() };
         assert!(stack.is_empty());
         stack.insert(1);

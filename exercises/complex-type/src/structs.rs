@@ -9,7 +9,7 @@ struct Person {
 }
 fn exercise1() -> Person {
     let age = 30;
-    // Hobby = Rust 
+    // Hobby = Rust
     let p = Person {
         name: String::from("sunface"),
         age,
@@ -96,7 +96,7 @@ fn exercise4() {
     let u2 = User {
         first: String::from("Mary"),
         ..u1
-        
+
     };
 
     println!("user: {:#?}", u1);
@@ -121,10 +121,10 @@ fn exercise5() {
         int_val: 20,
     });
 
-    
+
     let moved = foos[0];
 
-    
+
     let moved_field = foos[0].str_val;
 }
 
@@ -174,10 +174,10 @@ mod tests {
         let p_expectation = Person {
             name: String::from("sunface"),
             age: 30,
-            hobby:String::from("Rust") 
+            hobby:String::from("Rust")
         };
         assert_eq!(p, p_expectation);
-        
+
     }
 
     // Test for exercise 2
