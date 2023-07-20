@@ -72,8 +72,12 @@ mod tests {
     #[test]
     fn exercise2_should_work() {
         assert_eq!(parse_number("42"), Ok(42));
+        // assert_eq!(
+        //     parse_number("invalid"),
+        //     Err("invalid digit found in string".parse().unwrap())
+        // );
         assert_eq!(
-            parse_number("invalid"),
+            parse_number("invalid").map_err(|e| e.to_string()),
             Err("invalid digit found in string".parse().unwrap())
         );
     }
