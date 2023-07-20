@@ -74,14 +74,71 @@ fn static_dispatch<T: Foo>(x: T) -> String {
     x.method()
 }
 
+fn static_dispatch2(x: impl Foo) -> String {
+    x.method()
+}
+
 // Implement below with trait objects and parameters
 fn dynamic_dispatch(x: &dyn Foo) -> String {
     x.method()
 }
 
-fn dynamic_dispatch2<T: Foo>(x: &T) -> String {
+fn dynamic_dispatch2(x: Box<dyn Foo>) -> String {
     x.method()
 }
+
+enum Error {
+    NotFound,
+    FailToCreate,
+}
+
+impl From<Error> for String {
+    fn from(value: Error) -> Self {
+        match value {
+            Error::NotFound => "not found".to_string(),
+            Error::FailToCreate => "fail to create".to_string()
+        }
+    }
+}
+
+fn test() {
+    // cach su dung 1
+    let res = String::from(Error::NotFound);
+    println!("res: {}", res);
+    // cach su dung 2
+    let res2: String = Error::FailToCreate.into();
+    println!("res2: {}", res2);
+}
+
+// enum ErrorCustom {
+//     NotFound,
+//     FailToCreate,
+// }
+
+// impl std::error::Error for ErrorCustom {
+
+// }
+
+// impl std::fmt::Display for ErrorCustom {
+//     fn fmt(&self, f:&mut std::fmt::Formatter<'_>) -> std::fmt::{
+//         write(f, "{}", self)
+//     }
+// }
+
+// trait FromFake<T> {
+//     fn from_fake(value: T) -> Self;
+// }
+
+// impl FromFake<Box<dyn std::error::Error>> for String {
+//     fn from_fake(value: Box<dyn std::error::Error>) -> Self {
+//         value.to_string()
+//     }
+// }
+
+// fn test2() {
+//     let res = String::from_fake(Box::new(ErrorCustom::NotFound));
+//     println!("res: {}", res);
+// }
 
 // Exercise 5
 // Fix errors and fill in the blanks
